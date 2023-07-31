@@ -43,8 +43,9 @@ public class Country {
 		this.countryName = countryName;
 		this.countryCapital = countryCapital;
 	}
-	
-	
-	
+	public Country() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
 
 }

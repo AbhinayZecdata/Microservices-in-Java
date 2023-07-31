@@ -3,6 +3,8 @@ package com.example.demo.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,14 +32,26 @@ public class Controller {
 	}
 	
 	@GetMapping("/getcountries/{id}")
-	public Country getCountyById(@PathVariable(value="id")int id) {
-		return countryService.getCountryById(id);
+	public ResponseEntity<Country> getCountyById(@PathVariable(value="id")int id) {
+		try {
+			Country country= countryService.getCountryById(id);
+			return new ResponseEntity<Country>(country,HttpStatus.OK);
+			
+		} catch (Exception e) {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
 	}
 	
 	@GetMapping("/getcountries/countryname")
-	public Country getCountryByName(@RequestParam(value="name") String name) {
-			return countryService.getCountryByName(name);
-	}
+	public ResponseEntity<Country> getCountryByName(@RequestParam(value="name") String name) {
+		try {
+			Country country= countryService.getCountryByName(name);
+			return new ResponseEntity<Country>(country,HttpStatus.OK);
+			
+		} catch (Exception e) {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+	}      
 	
 	@PostMapping("/addcountry")
 	public Country addCountry(@RequestBody Country country) {
@@ -45,19 +59,23 @@ public class Controller {
 	}
 
 	@PutMapping("/updatecountry/{id}")
-	public Country updateCountry(@RequestBody Country country,@PathVariable(value="id") int id) {
-		Country existingCountry=countryService.getCountryById(id);
-		 if (existingCountry != null) {
-		        existingCountry.setCountryName(country.getCountryName());
-		        existingCountry.setCountryCapital(country.getCountryCapital());
-		        return countryService.updateCountry(existingCountry);
-		    } else {
-		        throw new RuntimeException("Country with ID " + id + " not found.");
-		    }
+	public ResponseEntity<Country> updateCountry(@RequestBody Country country,@PathVariable(value="id") int id) { 
+	try {
+		Country existCountry = countryService.getCountryById(id);
+		existCountry.setCountryName(country.getCountryName());
+		existCountry.setCountryCapital(country.getCountryCapital());
+		
+		Country UpdatedCountry = countryService.updateCountry(existCountry);
+		return new ResponseEntity<Country>(UpdatedCountry,HttpStatus.OK);
+	}
+	catch(Exception e) {
+		return new ResponseEntity<>(HttpStatus.CONFLICT);
+	}	
 	}
 	
 	@DeleteMapping("/deletecountry/{id}")
 	public AddResponse deleteCountry(@PathVariable(value="id") int id) {
-		return countryService.deleteCountry(id);	
-	}
+		return countryService.deleteCountry(id);
+		
+ 	}
 }
